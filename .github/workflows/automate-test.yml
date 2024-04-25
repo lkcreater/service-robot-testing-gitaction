@@ -1,0 +1,43 @@
+name: Robot Framework automate test tisco ffd
+
+on: [workflow_dispatch]
+
+jobs:
+  robot_test:
+    runs-on: ubuntu-latest
+    name: Run Robot Framework Tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Robot Framework
+        uses: joonvena/robotframework-docker-action@v1.0
+        with:
+          browser: 'chrome'
+          robot_threads: 2
+          robot_tests_dir: 'testcases/functional_tests'
+          robot_reports_dir: 'resources'
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+            name: reports
+            path: 'resources'
+  
+  generate_report:
+    if: always()
+    needs: [robot_test] 
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download reports
+      uses: actions/download-artifact@v1
+      with:
+        name: reports
+
+    - name: Send report to commit
+      uses: joonvena/robotframework-reporter-action@v2.3
+      with:
+        gh_access_token: ${{ secrets.KEY_TOKEN_GIT }}

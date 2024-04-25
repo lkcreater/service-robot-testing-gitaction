@@ -1,0 +1,7 @@
+LANGUAGE: th
+ENV: staging
+headless_flag: True
+browser : Chrome
+GLOBALTIMEOUT : 30
+timeout : 30
+seleniumSpeed : 0.5
